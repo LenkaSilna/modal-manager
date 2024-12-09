@@ -75,22 +75,22 @@
 
 Následující skripty jsou k dispozici pro spuštění a správu projektu:
 
-### `npm run dev`
+**`npm run dev`**
 Spustí vývojový server. Otevřete [http://localhost:3000](http://localhost:3000) ve vašem prohlížeči pro zobrazení aplikace.
 
-### `npm run build`
+**`npm run build`**
 Zkompiluje aplikaci pro produkční prostředí do složky `dist`. Použijte pro nasazení aplikace.
 
-### `npm start`
+**`npm start`**
 Spustí aplikaci z produkční sestavy. Ujistěte se, že jste nejprve spustili `npm run build`.
 
-### `npm run lint`
+**`npm run lint`**
 Spustí linter pro kontrolu kódu podle zadaných pravidel.
 
-### `npm run test`
+**`npm run test`**
 Spustí všechny jednotkové testy pomocí `jest`.
 
-### `npm run test:e2e`
+**`npm run test:e2e`**
 Spustí end-to-end testy pomocí `playwright`.
 
 ---
