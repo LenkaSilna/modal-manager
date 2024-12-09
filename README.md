@@ -1,40 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
 
-## Getting Started
+# Technická analýza: Systém správy modalů
 
-First, run the development server:
+## Zadání
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Cíl projektu
+1. Vytvořit systém, který zajistí:
+   - Nikdy se nezobrazí více než jeden modal současně.
+   - Zobrazení modalů se bude řídit podle **priority**:
+     - **Vyšší priorita má přednost**.
+     - Pokud mají dva nebo více modalů **stejnou prioritu**, použije se pravidlo **FIFO (First In, First Out)**.
+   - Podpora pro:
+     - **Uživatelské modaly** (otevřené na akci uživatele, např. kliknutí).
+     - **Automaticky se zobrazující modaly** (např. na základě systémové události nebo odpovědi API).
+   - Modaly mohou být z různých částí aplikace.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **Testovatelnost:**
+   - Unit testy: Pokrytí všech scénářů správy modalů.
+   - E2E testy: Simulace chování uživatele při práci s modaly.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+---
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+## Návrh architektury
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+### Správa modalů
+1. **Data struktura modalů:**
+   ```typescript
+   type Modal = {
+     id: string; // Jedinečný identifikátor
+     priority: number; // Priorita modalu (vyšší číslo = vyšší priorita)
+     content: React.ReactNode; // Obsah modalu
+     triggeredByUser: boolean; // Indikuje, zda modal spustil uživatel
+     timestamp: number; // Čas přidání
+   };
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. **Logika zpracování modalů:**
+   - **Přidávání modalů:** Modal je přidán do fronty a tříděn podle priority a timestampu (FIFO při stejné prioritě).
+   - **Odebírání modalů:** Po zavření aktuálního modalu se zobrazí další modal s nejvyšší prioritou.
 
-## Learn More
+3. **Komponenty:**
+   - **`ModalManager`:** Zodpovědný za vykreslení aktuálního modalu.
+   - **Volání modalů:** Každá část aplikace může přidat modal přes API `showModal`.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+### Typy modalů
+1. **Uživatelské modaly:**  
+   - Otevřené na akci uživatele (např. kliknutí na tlačítko).
+   - Např. potvrzovací dialog.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+2. **Automaticky se zobrazující modaly:**  
+   - Aktivované bez zásahu uživatele (např. po přijetí dat z API).
+   - Např. upozornění o vypršení session.
 
-## Deploy on Vercel
+3. **Modaly se stejnou prioritou:**  
+   - Zobrazí se v pořadí, v jakém byly přidány (FIFO).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+## Návrh testovacích scénářů
+
+### Unit testy
+1. **Správné třídění modalů podle priority.**
+2. **FIFO chování při stejné prioritě.**
+3. **Podpora uživatelských i automatických modalů.**
+
+### E2E testy
+1. **Ověření zobrazení správného modalu podle priority.**
+2. **Zobrazení automaticky spuštěného modalu po určitém čase.**
